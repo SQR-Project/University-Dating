@@ -14,7 +14,7 @@ RUN $VENV_PATH/bin/pip install poetry
 
 WORKDIR /dating-app
 
-RUN $VENV_PATH/bin/poetry update
+RUN $VENV_PATH/bin/poetry install
 
 WORKDIR /dating-app/app
 

@@ -19,6 +19,9 @@ jobs:
         with:
           poetry-version: '1.7.1'
 
+      - name: Install dependencies
+        run: poetry install
+
       - name: Run flake8 style check
         run: poetry run flake8 app/
 
