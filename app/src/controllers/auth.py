@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Response, Request, Depends
 from src.models.auth import AuthWithEmailRequest
 from src.services import auth_service
+from src.validators import email_validator
 
 
 auth_router = APIRouter(
@@ -11,11 +12,13 @@ auth_router = APIRouter(
 
 @auth_router.post("/register")
 def register(request: AuthWithEmailRequest, response: Response):
+    email_validator.validate(request)
     return auth_service.register(request, response)
 
 
 @auth_router.post("/login")
 def login(request: AuthWithEmailRequest, response: Response):
+    email_validator.validate(request)
     return auth_service.login(request, response)
 
 

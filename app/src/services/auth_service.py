@@ -37,22 +37,20 @@ def get_refresh_token(request: Request):
 
 
 def register(request: AuthWithEmailRequest, fastapi_response: FastApiResponse):
-    response = _email_auth_call(request, "accounts:signUp")
+    response = email_auth_call(request, "accounts:signUp")
     data = response.json()
     access_token = data["idToken"]
     refresh_token = data["refreshToken"]
-    user_id = data["user_id"]
-    _set_httponly_cookie(access_token, refresh_token, fastapi_response)
+    set_httponly_cookie(access_token, refresh_token, fastapi_response)
     return {"status": "success"}
 
 
 def login(request: AuthWithEmailRequest, fastapi_response: FastApiResponse):
-    response = _email_auth_call(request, "accounts:signInWithPassword")
+    response = email_auth_call(request, "accounts:signInWithPassword")
     data = response.json()
     access_token = data["idToken"]
     refresh_token = data["refreshToken"]
-    user_id = data["user_id"]
-    _set_httponly_cookie(access_token, refresh_token, fastapi_response)
+    set_httponly_cookie(access_token, refresh_token, fastapi_response)
     return {"status": "success"}
 
 
@@ -71,16 +69,16 @@ def refresh_auth_tokens(request: Request, fastapi_response: FastApiResponse):
     data = response.json()
     access_token = data["id_token"]
     refresh_token = data["refresh_token"]
-    _set_httponly_cookie(access_token, refresh_token, fastapi_response)
+    set_httponly_cookie(access_token, refresh_token, fastapi_response)
     return {"status": "success"}
 
 
-def _set_httponly_cookie(access_token: str, refresh_token: str, response: FastApiResponse):
+def set_httponly_cookie(access_token: str, refresh_token: str, response: FastApiResponse):
     response.set_cookie(key=ACCESS_TOKEN_NAME, value=f"Bearer {access_token}", httponly=True)
     response.set_cookie(key=REFRESH_TOKEN_NAME, value=refresh_token, httponly=True)
 
 
-def _email_auth_call(request: AuthWithEmailRequest, url_sub_path: str) -> Response:
+def email_auth_call(request: AuthWithEmailRequest, url_sub_path: str) -> Response:
     details = {
         "email": request.email,
         "password": request.password,
