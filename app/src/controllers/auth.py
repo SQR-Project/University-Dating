@@ -28,5 +28,7 @@ def refresh_tokens(request: Request, response: Response):
 
 
 @auth_router.get("/data-from-token")
-def refresh_tokens(decoded_token: dict = Depends(auth_service.verify_access_token)):
+def get_data_from_token(
+        decoded_token: dict = Depends(auth_service.verify_access_token)
+):
     return decoded_token

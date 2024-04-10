@@ -17,22 +17,32 @@ REFRESH_TOKEN_NAME = "refresh_token"
 def verify_access_token(request: Request):
     authorization = request.cookies.get(ACCESS_TOKEN_NAME)
     if not authorization:
-        raise HTTPException(status_code=401, detail="Authorization token missing")
+        raise HTTPException(
+            status_code=401,
+            detail="Authorization token missing")
 
     token = authorization.split(" ")[1]
     try:
-        id_info = id_token.verify_firebase_token(token, google_requests.Request())
+        id_info = id_token.verify_firebase_token(
+            token,
+            google_requests.Request()
+        )
         user_id = id_info['user_id']
         email = id_info['email']
         return {"user_id": user_id, "email": email}
     except ValueError:
-        raise HTTPException(status_code=401, detail="Invalid ID token")
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid ID token")
 
 
 def get_refresh_token(request: Request):
     refresh_token = request.cookies.get(REFRESH_TOKEN_NAME)
     if not refresh_token:
-        raise HTTPException(status_code=401, detail="Refresh token missing")
+        raise HTTPException(
+            status_code=401,
+            detail="Refresh token missing"
+        )
     return refresh_token
 
 
@@ -61,10 +71,19 @@ def refresh_auth_tokens(request: Request, fastapi_response: FastApiResponse):
         "refresh_token": get_refresh_token(request)
     }
 
-    response = requests.post(f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}", data=details)
+    response = requests.post(
+        f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",
+        data=details
+    )
 
     if "error" in response.json().keys():
-        raise HTTPException(status_code=401, detail={"status": "error", "message": response.json()["error"]["message"]})
+        raise HTTPException(
+            status_code=401,
+            detail={
+                "status": "error",
+                "message": response.json()["error"]["message"]
+            }
+        )
 
     data = response.json()
     access_token = data["id_token"]
@@ -73,24 +92,54 @@ def refresh_auth_tokens(request: Request, fastapi_response: FastApiResponse):
     return {"status": "success"}
 
 
-def set_httponly_cookie(access_token: str, refresh_token: str, response: FastApiResponse):
-    response.set_cookie(key=ACCESS_TOKEN_NAME, value=f"Bearer {access_token}", httponly=True)
-    response.set_cookie(key=REFRESH_TOKEN_NAME, value=refresh_token, httponly=True)
+def set_httponly_cookie(
+        access_token: str,
+        refresh_token: str,
+        response: FastApiResponse
+):
+    response.set_cookie(
+        key=ACCESS_TOKEN_NAME,
+        value=f"Bearer {access_token}",
+        httponly=True
+    )
+    response.set_cookie(
+        key=REFRESH_TOKEN_NAME,
+        value=refresh_token,
+        httponly=True
+    )
 
 
-def email_auth_call(request: AuthWithEmailRequest, url_sub_path: str) -> Response:
+def email_auth_call(
+        request: AuthWithEmailRequest,
+        url_sub_path: str
+) -> Response:
     details = {
         "email": request.email,
         "password": request.password,
         "returnSecureToken": True
     }
 
-    response = requests.post(f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}", data=details)
+    response = requests.post(
+        f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",
+        data=details
+    )
 
     if "error" in response.json().keys():
-        raise HTTPException(status_code=401, detail={"status": "error", "message": response.json()["error"]["message"]})
+        raise HTTPException(
+            status_code=401,
+            detail={
+                "status": "error",
+                "message": response.json()["error"]["message"]
+            }
+        )
 
     if "idToken" not in response.json().keys():
-        raise HTTPException(status_code=404, detail={"status": "error", "message": "Token not found in response"})
+        raise HTTPException(
+            status_code=404,
+            detail={
+                "status": "error",
+                "message": "Token not found in response"
+            }
+        )
 
     return response
