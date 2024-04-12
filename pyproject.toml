@@ -4,7 +4,9 @@ version = "0.1.0"
 description = ""
 authors = [
     "Damir Nabiullin <d.nabiullin@innoplois.university>",
-    "Anna Dluzhinskaya <a.dluzhinskaya@innoplois.university>"
+    "Anna Dluzhinskaya <a.dluzhinskaya@innoplois.university>",
+    "Karina Tyulebaeva <k.tyulebaeva@innopolis.university>",
+    "Renata Shakirova <r.shakirova@innopolis.university>"
 ]
 readme = "README.md"
 
