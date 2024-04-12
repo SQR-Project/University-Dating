@@ -9,27 +9,35 @@ from requests import Response
 from src.models.auth import AuthWithEmailRequest
 
 FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
+PROJECT_ID = os.getenv("PROJECT_ID")
 BASE_API_URL = "https://identitytoolkit.googleapis.com/v1/"
 ACCESS_TOKEN_NAME = "access_token"
 REFRESH_TOKEN_NAME = "refresh_token"
 
 
-def verify_access_token(request: Request):
+def get_token_from_cookie(request: Request):
     authorization = request.cookies.get(ACCESS_TOKEN_NAME)
     if not authorization:
         raise HTTPException(
             status_code=401,
             detail="Authorization token missing")
 
-    token = authorization.split(" ")[1]
+    return authorization.split(" ")[1]
+
+
+def verify_access_token(request: Request):
+    token = get_token_from_cookie(request)
     try:
         id_info = id_token.verify_firebase_token(
             token,
             google_requests.Request()
         )
-        user_id = id_info['user_id']
-        email = id_info['email']
-        return {"user_id": user_id, "email": email}
+        user_id = id_info["user_id"]
+        email = id_info["email"]
+        return {
+            "user_id": user_id,
+            "email": email
+        }
     except ValueError:
         raise HTTPException(
             status_code=401,
@@ -61,6 +69,31 @@ def login(request: AuthWithEmailRequest, fastapi_response: FastApiResponse):
     access_token = data["idToken"]
     refresh_token = data["refreshToken"]
     set_httponly_cookie(access_token, refresh_token, fastapi_response)
+    return {"status": "success"}
+
+
+def delete_auth_for_user(request: Request):
+    verify_access_token(request)
+    token = get_token_from_cookie(request)
+    url_sub_path = "accounts:delete"
+    details = {
+        "idToken": token
+    }
+
+    response = requests.post(
+        f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",
+        data=details
+    )
+
+    if "error" in response.json().keys():
+        raise HTTPException(
+            status_code=401,
+            detail={
+                "status": "error",
+                "message": response.json()["error"]["message"]
+            }
+        )
+
     return {"status": "success"}
 
 

@@ -12,13 +12,13 @@ auth_router = APIRouter(
 
 @auth_router.post("/register")
 def register(request: AuthWithEmailRequest, response: Response):
-    email_validator.validate(request)
+    email_validator.validate(request.email)
     return auth_service.register(request, response)
 
 
 @auth_router.post("/login")
 def login(request: AuthWithEmailRequest, response: Response):
-    email_validator.validate(request)
+    email_validator.validate(request.email)
     return auth_service.login(request, response)
 
 
@@ -27,8 +27,9 @@ def refresh_tokens(request: Request, response: Response):
     return auth_service.refresh_auth_tokens(request, response)
 
 
-@auth_router.get("/data-from-token")
-def get_data_from_token(
-        decoded_token: dict = Depends(auth_service.verify_access_token)
+@auth_router.delete("/auth-data")
+def delete_auth_data(
+        request: Request,
+        _: dict = Depends(auth_service.verify_access_token)
 ):
-    return decoded_token
+    return auth_service.delete_auth_for_user(request)

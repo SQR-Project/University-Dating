@@ -1,8 +1,8 @@
 import uuid
+from unittest.mock import patch, MagicMock
 
 import pytest
-from unittest.mock import patch, MagicMock
-from fastapi import HTTPException, Response, Request
+from fastapi import HTTPException, Response
 
 from app.src.models.auth import AuthWithEmailRequest
 from app.src.services import auth_service
@@ -23,7 +23,7 @@ def valid_email_auth_data_response():
     }
 
 
-@patch('app.src.services.auth_service.requests.post')
+@patch("app.src.services.auth_service.requests.post")
 def test_email_auth_call_response_error(mock_post):
     # Arrange
     error_message = str(uuid.uuid4())
@@ -36,7 +36,10 @@ def test_email_auth_call_response_error(mock_post):
     # Act
     with pytest.raises(Exception) as exc_info:
         auth_service.email_auth_call(
-            AuthWithEmailRequest(email=VALID_EMAIL, password=str(uuid.uuid4())),
+            AuthWithEmailRequest(
+                email=VALID_EMAIL,
+                password=str(uuid.uuid4())
+            ),
             "subPath")
 
     # Assert
@@ -45,7 +48,7 @@ def test_email_auth_call_response_error(mock_post):
     assert error_message in str(exc_info.value.detail)
 
 
-@patch('app.src.services.auth_service.requests.post')
+@patch("app.src.services.auth_service.requests.post")
 def test_email_auth_call_no_access_token_in_response(mock_post):
     # Arrange
     mock_post.return_value.json.return_value = {
@@ -55,7 +58,10 @@ def test_email_auth_call_no_access_token_in_response(mock_post):
     # Act
     with pytest.raises(Exception) as exc_info:
         auth_service.email_auth_call(
-            AuthWithEmailRequest(email=VALID_EMAIL, password=str(uuid.uuid4())),
+            AuthWithEmailRequest(
+                email=VALID_EMAIL,
+                password=str(uuid.uuid4())
+            ),
             "subPath")
 
     # Assert
@@ -64,14 +70,23 @@ def test_email_auth_call_no_access_token_in_response(mock_post):
     assert "Token not found in response" in str(exc_info.value.detail)
 
 
-@patch('app.src.services.auth_service.requests.post')
-def test_email_auth_call_success(mock_post, valid_email_auth_data_response):
+@patch("app.src.services.auth_service.requests.post")
+def test_email_auth_call_success(
+        mock_post,
+        valid_email_auth_data_response
+):
     # Arrange
-    mock_post.return_value.json.return_value = valid_email_auth_data_response
+    mock_post.return_value.json.return_value =\
+        valid_email_auth_data_response
 
     # Act
-    response = auth_service.email_auth_call(AuthWithEmailRequest(email=VALID_EMAIL, password=str(uuid.uuid4())),
-                                            "subPath")
+    response = auth_service.email_auth_call(
+        AuthWithEmailRequest(
+            email=VALID_EMAIL,
+            password=str(uuid.uuid4())
+        ),
+        "subPath"
+    )
 
     # Assert
     assert response.json() is not None
@@ -83,21 +98,25 @@ def test_set_httponly_cookie():
     response = Response()
 
     # Act
-    auth_service.set_httponly_cookie(VALID_ACCESS_TOKEN, VALID_REFRESH_TOKEN, response)
+    auth_service.set_httponly_cookie(
+        VALID_ACCESS_TOKEN,
+        VALID_REFRESH_TOKEN,
+        response
+    )
 
     # Assert
     assert str(response.raw_headers).count("set-cookie") == 2
     assert str(response.raw_headers).count("HttpOnly") == 2
 
 
-def test_verify_access_token_no_token_in_cookie():
+def test_get_token_from_cookie_no_token_in_cookie():
     # Arrange
     request = MagicMock()
     request.cookies.get.return_value = None
 
     # Act
     with pytest.raises(Exception) as exc_info:
-        auth_service.verify_access_token(request)
+        auth_service.get_token_from_cookie(request)
 
     # Assert
     assert type(exc_info.value) is HTTPException
@@ -105,37 +124,28 @@ def test_verify_access_token_no_token_in_cookie():
     assert "Authorization token missing" in str(exc_info.value.detail)
 
 
-def test_verify_access_token_invalid_token_format_in_cookie():
+def test_get_token_from_cookie_invalid_token_format_in_cookie():
     # Arrange
     request = MagicMock()
     request.cookies.get.return_value = VALID_ACCESS_TOKEN
 
     # Act
     with pytest.raises(Exception) as exc_info:
-        auth_service.verify_access_token(request)
+        auth_service.get_token_from_cookie(request)
 
     # Assert
     assert type(exc_info.value) is IndexError
 
 
-def test_refresh_auth_tokens_success():
+@patch("app.src.services.auth_service.id_token")
+@patch("app.src.services.auth_service.get_refresh_token")
+def test_verify_access_token_token_verification_error(
+        mock_get_refresh_token,
+        mock_id_token
+):
     # Arrange
     request = MagicMock()
-    request.cookies.get.return_value = VALID_ACCESS_TOKEN
-
-    # Act
-    with pytest.raises(Exception) as exc_info:
-        auth_service.verify_access_token(request)
-
-    # Assert
-    assert type(exc_info.value) is IndexError
-
-
-@patch('app.src.services.auth_service.id_token')
-def test_verify_access_token_token_verification_error(mock_id_token):
-    # Arrange
-    request = MagicMock()
-    request.cookies.get.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
+    mock_get_refresh_token.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
     mock_id_token.verify_firebase_token.side_effect = ValueError()
 
     # Act
@@ -148,11 +158,12 @@ def test_verify_access_token_token_verification_error(mock_id_token):
     assert "Invalid ID token" in str(exc_info.value.detail)
 
 
-@patch('app.src.services.auth_service.id_token')
-def test_verify_access_token_success(mock_id_token):
+@patch("app.src.services.auth_service.id_token")
+@patch("app.src.services.auth_service.get_refresh_token")
+def test_verify_access_token_success(mock_get_refresh_token, mock_id_token):
     # Arrange
     request = MagicMock()
-    request.cookies.get.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
+    mock_get_refresh_token.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
     mock_id_token.verify_firebase_token.return_value = {
         "user_id": VALID_USER_ID,
         "email": VALID_EMAIL
@@ -194,8 +205,8 @@ def test_get_refresh_token_success():
     assert result == VALID_REFRESH_TOKEN
 
 
-@patch('app.src.services.auth_service.get_refresh_token')
-@patch('app.src.services.auth_service.requests.post')
+@patch("app.src.services.auth_service.get_refresh_token")
+@patch("app.src.services.auth_service.requests.post")
 def test_refresh_auth_tokens_response_error(mock_post, mock_get_refresh_token):
     # Arrange
     mock_get_refresh_token.return_value = VALID_REFRESH_TOKEN
@@ -216,8 +227,8 @@ def test_refresh_auth_tokens_response_error(mock_post, mock_get_refresh_token):
     assert error_message in str(exc_info.value.detail)
 
 
-@patch('app.src.services.auth_service.get_refresh_token')
-@patch('app.src.services.auth_service.requests.post')
+@patch("app.src.services.auth_service.get_refresh_token")
+@patch("app.src.services.auth_service.requests.post")
 def test_refresh_auth_tokens_success(mock_post, mock_get_refresh_token):
     # Arrange
     mock_get_refresh_token.return_value = VALID_REFRESH_TOKEN
@@ -234,27 +245,103 @@ def test_refresh_auth_tokens_success(mock_post, mock_get_refresh_token):
     assert result == {"status": "success"}
 
 
-@patch('app.src.services.auth_service.email_auth_call')
-def test_register(mock_email_auth_call, valid_email_auth_data_response):
+@patch("app.src.services.auth_service.verify_access_token")
+@patch("app.src.services.auth_service.get_token_from_cookie")
+@patch("app.src.services.auth_service.requests.post")
+def test_delete_auth_for_user_response_error(
+        mock_post,
+        mock_get_token_from_cookie,
+        mock_verify_access_token
+):
     # Arrange
-    auth_service.set_httponly_cookie = MagicMock()
-    mock_email_auth_call.return_value.json.return_value = valid_email_auth_data_response
+    mock_verify_access_token.return_value = {
+        "user_id": VALID_USER_ID,
+        "email": VALID_EMAIL
+    }
+    mock_get_token_from_cookie.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
+    error_message = str(uuid.uuid4())
+    mock_post.return_value.json.return_value = {
+        "error": {
+            "message": error_message
+        }
+    }
 
     # Act
-    result = auth_service.register(AuthWithEmailRequest(email=VALID_EMAIL, password=str(uuid.uuid4())), MagicMock())
+    with pytest.raises(Exception) as exc_info:
+        auth_service.delete_auth_for_user(MagicMock())
+
+    # Assert
+    assert type(exc_info.value) is HTTPException
+    assert exc_info.value.status_code == 401
+    assert error_message in str(exc_info.value.detail)
+
+
+@patch("app.src.services.auth_service.verify_access_token")
+@patch("app.src.services.auth_service.get_token_from_cookie")
+@patch("app.src.services.auth_service.requests.post")
+def test_delete_auth_for_user_success(
+        mock_post,
+        mock_get_token_from_cookie,
+        mock_verify_access_token
+):
+    # Arrange
+    mock_verify_access_token.return_value = {
+        "user_id": VALID_USER_ID,
+        "email": VALID_EMAIL
+    }
+    mock_get_token_from_cookie.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
+    mock_post.return_value.json.return_value = {
+        "success": True
+    }
+
+    # Act
+    result = auth_service.delete_auth_for_user(MagicMock())
 
     # Assert
     assert result == {"status": "success"}
 
 
-@patch('app.src.services.auth_service.email_auth_call')
-def test_login(mock_email_auth_call, valid_email_auth_data_response):
+@patch("app.src.services.auth_service.email_auth_call")
+def test_register(
+        mock_email_auth_call,
+        valid_email_auth_data_response
+):
     # Arrange
     auth_service.set_httponly_cookie = MagicMock()
-    mock_email_auth_call.return_value.json.return_value = valid_email_auth_data_response
+    mock_email_auth_call.return_value.json.return_value = \
+        valid_email_auth_data_response
 
     # Act
-    result = auth_service.login(AuthWithEmailRequest(email=VALID_EMAIL, password=str(uuid.uuid4())), MagicMock())
+    result = auth_service.register(
+        AuthWithEmailRequest(
+            email=VALID_EMAIL,
+            password=str(uuid.uuid4())
+        ),
+        MagicMock()
+    )
+
+    # Assert
+    assert result == {"status": "success"}
+
+
+@patch("app.src.services.auth_service.email_auth_call")
+def test_login(
+        mock_email_auth_call,
+        valid_email_auth_data_response
+):
+    # Arrange
+    auth_service.set_httponly_cookie = MagicMock()
+    mock_email_auth_call.return_value.json.return_value = \
+        valid_email_auth_data_response
+
+    # Act
+    result = auth_service.login(
+        AuthWithEmailRequest(
+            email=VALID_EMAIL,
+            password=str(uuid.uuid4())
+        ),
+        MagicMock()
+    )
 
     # Assert
     assert result == {"status": "success"}
