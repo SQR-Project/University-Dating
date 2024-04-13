@@ -1,14 +1,10 @@
-from fastapi.testclient import TestClient
+from fastapi.routing import APIRoute
 
 from app.main import app
 
+AUTH_ROUTES_COUNT = 4
 
-def test_endpoint_get_ok():
-    # Arrange
-    client = TestClient(app)
 
-    # Act
-    response = client.get("/settings/200")
-
-    assert response.status_code == 200
-    assert response.json() is True
+def test_app_routes_count():
+    api_routes = list(filter(lambda x: type(x) is APIRoute, app.routes))
+    assert len(api_routes) == AUTH_ROUTES_COUNT

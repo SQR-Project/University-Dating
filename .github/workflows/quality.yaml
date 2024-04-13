@@ -1,9 +1,15 @@
 name: Quality-check
 
-on: pull_request
+on:
+  pull_request:
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - '.github/workflows/quality.yaml'
 
 env:
   COVERAGE_FAIL_UNDER: 85
+  LINE_COVERAGE_FAIL_UNDER: 70
 
 jobs:
   quality:
@@ -22,11 +28,17 @@ jobs:
       - name: Install dependencies
         run: poetry install
 
+      - name: Run Bandit vulnerabilities check
+        run: poetry run bandit -r app/ -lll
+
       - name: Run flake8 style check
         run: poetry run flake8 app/
 
       - name: Run flake8 complexity check
         run: poetry run flake8 --max-complexity 10 app/
 
-      - name: Run pytest with coverage check
+      - name: Run tests with line coverage check
+        run: poetry run pytest --cov=app --cov-report=term --cov-fail-under=$LINE_COVERAGE_FAIL_UNDER
+
+      - name: Run test with combined coverage check
         run: poetry run pytest --cov=app --cov-branch --cov-report=term --cov-fail-under=$COVERAGE_FAIL_UNDER
