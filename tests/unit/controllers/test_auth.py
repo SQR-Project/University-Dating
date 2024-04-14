@@ -2,6 +2,8 @@ import uuid
 from unittest.mock import patch, MagicMock
 
 from app.src.controllers import auth
+from app.src.models.auth import VerifyAccessTokenResult
+from app.src.models.response import SuccessResponse
 
 
 @patch("app.src.controllers.auth.email_validator.validate")
@@ -9,7 +11,7 @@ from app.src.controllers import auth
 def test_register(mock_register, mock_validate):
     # Arrange
     mock_validate.return_value = True
-    mock_register.return_value = {"status": "success"}
+    mock_register.return_value = SuccessResponse()
     request = MagicMock()
     request.email = str(uuid.uuid4())
 
@@ -17,7 +19,7 @@ def test_register(mock_register, mock_validate):
     response = auth.register(request, MagicMock())
 
     # Assert
-    assert response == {"status": "success"}
+    assert response.status == "success"
 
 
 @patch("app.src.controllers.auth.email_validator.validate")
@@ -25,7 +27,7 @@ def test_register(mock_register, mock_validate):
 def test_login(mock_login, mock_validate):
     # Arrange
     mock_validate.return_value = True
-    mock_login.return_value = {"status": "success"}
+    mock_login.return_value = SuccessResponse()
     request = MagicMock()
     request.email = str(uuid.uuid4())
 
@@ -33,19 +35,19 @@ def test_login(mock_login, mock_validate):
     response = auth.login(request, MagicMock())
 
     # Assert
-    assert response == {"status": "success"}
+    assert response.status == "success"
 
 
 @patch("app.src.controllers.auth.auth_service.refresh_auth_tokens")
 def test_refresh_tokens(mock_refresh_auth_tokens):
     # Arrange
-    mock_refresh_auth_tokens.return_value = {"status": "success"}
+    mock_refresh_auth_tokens.return_value = SuccessResponse()
 
     # Act
     response = auth.refresh_tokens(MagicMock(), MagicMock())
 
     # Assert
-    assert response == {"status": "success"}
+    assert response.status == "success"
 
 
 @patch("app.src.controllers.auth.auth_service.verify_access_token")
@@ -55,14 +57,11 @@ def test_delete_auth_data(
         mock_verify_access_token
 ):
     # Arrange
-    mock_delete_auth_for_user.return_value = {"status": "success"}
-    mock_verify_access_token.return_value = {
-        "user_id": "UserId",
-        "email": "Email"
-    }
+    mock_delete_auth_for_user.return_value = SuccessResponse()
+    mock_verify_access_token.return_value = VerifyAccessTokenResult(user_id="UserId", email="Email")
 
     # Act
     response = auth.delete_auth_data(MagicMock(), MagicMock())
 
     # Assert
-    assert response == {"status": "success"}
+    assert response.status == "success"

@@ -6,7 +6,8 @@ from fastapi import Response as FastApiResponse
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from requests import Response
-from src.models.auth import AuthWithEmailRequest
+from src.models.auth import AuthWithEmailRequest, VerifyAccessTokenResult
+from src.models.response import SuccessResponse
 
 FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
 PROJECT_ID = os.getenv("PROJECT_ID")
@@ -20,7 +21,8 @@ def get_token_from_cookie(request: Request):
     if not authorization:
         raise HTTPException(
             status_code=401,
-            detail="Authorization token missing")
+            detail="Authorization token missing"
+        )
 
     return authorization.split(" ")[1]
 
@@ -34,14 +36,12 @@ def verify_access_token(request: Request):
         )
         user_id = id_info["user_id"]
         email = id_info["email"]
-        return {
-            "user_id": user_id,
-            "email": email
-        }
+        return VerifyAccessTokenResult(user_id=user_id, email=email)
     except ValueError:
         raise HTTPException(
             status_code=401,
-            detail="Invalid ID token")
+            detail="Invalid ID token"
+        )
 
 
 def get_refresh_token(request: Request):
@@ -60,7 +60,7 @@ def register(request: AuthWithEmailRequest, fastapi_response: FastApiResponse):
     access_token = data["idToken"]
     refresh_token = data["refreshToken"]
     set_httponly_cookie(access_token, refresh_token, fastapi_response)
-    return {"status": "success"}
+    return SuccessResponse()
 
 
 def login(request: AuthWithEmailRequest, fastapi_response: FastApiResponse):
@@ -69,7 +69,7 @@ def login(request: AuthWithEmailRequest, fastapi_response: FastApiResponse):
     access_token = data["idToken"]
     refresh_token = data["refreshToken"]
     set_httponly_cookie(access_token, refresh_token, fastapi_response)
-    return {"status": "success"}
+    return SuccessResponse()
 
 
 def delete_auth_for_user(request: Request):
@@ -94,7 +94,7 @@ def delete_auth_for_user(request: Request):
             }
         )
 
-    return {"status": "success"}
+    return SuccessResponse()
 
 
 def refresh_auth_tokens(request: Request, fastapi_response: FastApiResponse):
@@ -122,7 +122,7 @@ def refresh_auth_tokens(request: Request, fastapi_response: FastApiResponse):
     access_token = data["id_token"]
     refresh_token = data["refresh_token"]
     set_httponly_cookie(access_token, refresh_token, fastapi_response)
-    return {"status": "success"}
+    return SuccessResponse()
 
 
 def set_httponly_cookie(
