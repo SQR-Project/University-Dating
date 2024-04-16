@@ -55,7 +55,10 @@ def get_refresh_token(request: Request):
 
 
 def register(request: AuthWithEmailRequest, fastapi_response: FastApiResponse):
-    response = email_auth_call(request, "accounts:signUp")  # pragma: no mutate
+    response = email_auth_call(
+        request,
+        "accounts:signUp"  # pragma: no mutate
+    )
     data = response.json()
     access_token = data["idToken"]  # pragma: no mutate
     refresh_token = data["refreshToken"]  # pragma: no mutate
