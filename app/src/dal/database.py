@@ -26,6 +26,13 @@ class Database:
         );""")
         self.conn.commit()
 
+    def check(self) -> bool:
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT 1"
+        )
+        return cursor.fetchall() is not None
+
     def add_profile(
             self,
             token_data: VerifyAccessTokenResult,

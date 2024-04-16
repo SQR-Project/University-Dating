@@ -45,7 +45,8 @@ def test_email_auth_call_response_error(mock_post):
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 401
-    assert error_message in str(exc_info.value.detail)
+    assert "error" == exc_info.value.detail["status"]
+    assert error_message == exc_info.value.detail["message"]
 
 
 @patch("app.src.services.auth_service.requests.post")
@@ -67,7 +68,8 @@ def test_email_auth_call_no_access_token_in_response(mock_post):
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 404
-    assert "Token not found in response" in str(exc_info.value.detail)
+    assert "error" == exc_info.value.detail["status"]
+    assert "Token not found in response" == exc_info.value.detail["message"]
 
 
 @patch("app.src.services.auth_service.requests.post")
@@ -109,6 +111,18 @@ def test_set_httponly_cookie():
     assert str(response.raw_headers).count("HttpOnly") == 2
 
 
+def test_get_token_from_cookie_success():
+    # Arrange
+    request = MagicMock()
+    request.cookies.get.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
+
+    # Act
+    result = auth_service.get_token_from_cookie(request)
+
+    # Assert
+    assert result == VALID_ACCESS_TOKEN
+
+
 def test_get_token_from_cookie_no_token_in_cookie():
     # Arrange
     request = MagicMock()
@@ -121,7 +135,7 @@ def test_get_token_from_cookie_no_token_in_cookie():
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 401
-    assert "Authorization token missing" in str(exc_info.value.detail)
+    assert "Authorization token missing" == exc_info.value.detail
 
 
 def test_get_token_from_cookie_invalid_token_format_in_cookie():
@@ -138,14 +152,14 @@ def test_get_token_from_cookie_invalid_token_format_in_cookie():
 
 
 @patch("app.src.services.auth_service.id_token")
-@patch("app.src.services.auth_service.get_refresh_token")
+@patch("app.src.services.auth_service.get_token_from_cookie")
 def test_verify_access_token_token_verification_error(
-        mock_get_refresh_token,
+        mock_get_token_from_cookie,
         mock_id_token
 ):
     # Arrange
     request = MagicMock()
-    mock_get_refresh_token.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
+    mock_get_token_from_cookie.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
     mock_id_token.verify_firebase_token.side_effect = ValueError()
 
     # Act
@@ -155,15 +169,16 @@ def test_verify_access_token_token_verification_error(
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 401
-    assert "Invalid ID token" in str(exc_info.value.detail)
+    assert "Invalid ID token" == exc_info.value.detail
+    mock_get_token_from_cookie.assert_called_once_with(request)
 
 
 @patch("app.src.services.auth_service.id_token")
-@patch("app.src.services.auth_service.get_refresh_token")
-def test_verify_access_token_success(mock_get_refresh_token, mock_id_token):
+@patch("app.src.services.auth_service.get_token_from_cookie")
+def test_verify_access_token_success(mock_get_token_from_cookie, mock_id_token):
     # Arrange
     request = MagicMock()
-    mock_get_refresh_token.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
+    mock_get_token_from_cookie.return_value = f"Bearer {VALID_ACCESS_TOKEN}"
     mock_id_token.verify_firebase_token.return_value = {
         "user_id": VALID_USER_ID,
         "email": VALID_EMAIL
@@ -177,6 +192,7 @@ def test_verify_access_token_success(mock_get_refresh_token, mock_id_token):
     assert type(result) is auth_service.VerifyAccessTokenResult
     assert result.user_id == VALID_USER_ID
     assert result.email == VALID_EMAIL
+    mock_get_token_from_cookie.assert_called_once_with(request)
 
 
 def test_get_refresh_token_no_token_in_cookie():
@@ -191,7 +207,7 @@ def test_get_refresh_token_no_token_in_cookie():
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 401
-    assert "Refresh token missing" in str(exc_info.value.detail)
+    assert "Refresh token missing" == exc_info.value.detail
 
 
 def test_get_refresh_token_success():
@@ -217,15 +233,18 @@ def test_refresh_auth_tokens_response_error(mock_post, mock_get_refresh_token):
             "message": error_message
         }
     }
+    request = MagicMock()
 
     # Act
     with pytest.raises(Exception) as exc_info:
-        auth_service.refresh_auth_tokens(MagicMock(), MagicMock())
+        auth_service.refresh_auth_tokens(request, MagicMock())
 
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 401
-    assert error_message in str(exc_info.value.detail)
+    assert "error" == exc_info.value.detail["status"]
+    assert error_message == exc_info.value.detail["message"]
+    mock_get_refresh_token.assert_called_once_with(request)
 
 
 @patch("app.src.services.auth_service.get_refresh_token")
@@ -238,12 +257,15 @@ def test_refresh_auth_tokens_success(mock_post, mock_get_refresh_token):
         "id_token": VALID_ACCESS_TOKEN,
         "refresh_token": new_refresh_token
     }
+    request = MagicMock()
 
     # Act
-    result = auth_service.refresh_auth_tokens(MagicMock(), MagicMock())
+    result = auth_service.refresh_auth_tokens(request, MagicMock())
 
     # Assert
+    assert isinstance(result, auth_service.SuccessResponse)
     assert result.status == "success"
+    mock_get_refresh_token.assert_called_once_with(request)
 
 
 @patch("app.src.services.auth_service.verify_access_token")
@@ -266,15 +288,19 @@ def test_delete_auth_for_user_response_error(
             "message": error_message
         }
     }
+    request = MagicMock()
 
     # Act
     with pytest.raises(Exception) as exc_info:
-        auth_service.delete_auth_for_user(MagicMock())
+        auth_service.delete_auth_for_user(request)
 
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 401
-    assert error_message in str(exc_info.value.detail)
+    assert "error" == exc_info.value.detail["status"]
+    assert error_message == exc_info.value.detail["message"]
+    mock_verify_access_token.assert_called_once_with(request)
+    mock_get_token_from_cookie.assert_called_once_with(request)
 
 
 @patch("app.src.services.auth_service.verify_access_token")
@@ -294,12 +320,16 @@ def test_delete_auth_for_user_success(
     mock_post.return_value.json.return_value = {
         "success": True
     }
+    request = MagicMock()
 
     # Act
-    result = auth_service.delete_auth_for_user(MagicMock())
+    result = auth_service.delete_auth_for_user(request)
 
     # Assert
+    assert isinstance(result, auth_service.SuccessResponse)
     assert result.status == "success"
+    mock_verify_access_token.assert_called_once_with(request)
+    mock_get_token_from_cookie.assert_called_once_with(request)
 
 
 @patch("app.src.services.auth_service.email_auth_call")
@@ -322,7 +352,9 @@ def test_register(
     )
 
     # Assert
+    assert isinstance(result, auth_service.SuccessResponse)
     assert result.status == "success"
+    mock_email_auth_call.return_value.json.assert_called_once()
 
 
 @patch("app.src.services.auth_service.email_auth_call")
@@ -345,4 +377,6 @@ def test_login(
     )
 
     # Assert
+    assert isinstance(result, auth_service.SuccessResponse)
     assert result.status == "success"
+    mock_email_auth_call.return_value.json.assert_called_once()

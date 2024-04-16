@@ -32,6 +32,7 @@ def test_create_profile(mock_db):
 
     # Assert
     assert isinstance(response, profile_service.SuccessResponse)
+    assert response.status == "success"
     mock_db.return_value.add_profile.assert_called_once_with(VALID_TOKEN_DATA, request)
 
 
@@ -48,7 +49,7 @@ def test_create_profile_db_throws_integrity_error_raise_http_exception(mock_db):
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 400
-    assert "Profile already exists" in str(exc_info.value.detail)
+    assert "Profile already exists" == exc_info.value.detail
     mock_db.return_value.add_profile.assert_called_once_with(VALID_TOKEN_DATA, request)
 
 
@@ -62,6 +63,7 @@ def test_delete_profile(mock_db):
 
     # Assert
     assert isinstance(response, profile_service.SuccessResponse)
+    assert response.status == "success"
     mock_db.return_value.delete_profile.assert_called_once_with(VALID_TOKEN_DATA)
 
 

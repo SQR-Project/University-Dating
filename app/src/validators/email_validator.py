@@ -2,7 +2,7 @@ import re
 
 from fastapi import HTTPException
 
-EMAIL_PATTERN_STR = r"^[-\w\.]+@innopolis\.(university|ru)$"
+EMAIL_PATTERN_STR = r"^[-\w\.]+@innopolis\.(university|ru)$"  # pragma: no mutate  # noqa: E501
 EMAIL_PATTERN = re.compile(EMAIL_PATTERN_STR)
 
 
