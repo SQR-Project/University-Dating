@@ -1,6 +1,6 @@
 import sqlite3
 
-from fastapi import Request, HTTPException
+from fastapi import HTTPException
 from src.dal.database import Database
 from src.models.auth import VerifyAccessTokenResult
 from src.models.profile import CreateProfileRequest, ProfileInformation
