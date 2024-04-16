@@ -21,7 +21,7 @@ class Database:
             name VARCHAR NOT NULL,
             surname VARCHAR NOT NULL,
             age REAL NOT NULL,
-            primary_interest TEXT CHECK(primary_interest IN 
+            primary_interest TEXT CHECK(primary_interest IN
             ('sport', 'programming', 'music', 'reading', 'travel'))
         );""")
         self.conn.commit()
@@ -33,7 +33,7 @@ class Database:
     ):
         cursor = self.conn.cursor()
         cursor.execute(
-            """INSERT INTO profiles 
+            """INSERT INTO profiles
             (user_id, email, name, surname, age, primary_interest)
             VALUES (?, ?, ?, ?, ?, ?)""",
             (
