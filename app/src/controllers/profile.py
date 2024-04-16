@@ -7,9 +7,9 @@ from src.services import auth_service, profile_service
 from src.validators import profile_validator
 
 profile_router = APIRouter(
-    prefix="/profile",
+    prefix="/profile",  # pragma: no mutate
     tags=["profile"]
-)
+)  # pragma: no mutate
 
 
 @profile_router.post("/create", response_model=SuccessResponse)

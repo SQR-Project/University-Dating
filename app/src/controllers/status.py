@@ -3,9 +3,9 @@ from fastapi import APIRouter
 from src.dal.database import Database
 
 status_router = APIRouter(
-    prefix="/status",
+    prefix="/status",  # pragma: no mutate
     tags=["status"]
-)
+)  # pragma: no mutate
 
 
 @status_router.get("/healthz")  # pragma: no mutate

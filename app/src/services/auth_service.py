@@ -81,7 +81,7 @@ def delete_auth_for_user(request: Request):
     url_sub_path = "accounts:delete"  # pragma: no mutate
     details = {
         "idToken": token  # pragma: no mutate
-    }
+    }  # pragma: no mutate
 
     response = requests.post(
         f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",  # pragma: no mutate  # noqa: E501
@@ -102,7 +102,7 @@ def delete_auth_for_user(request: Request):
 
 def refresh_auth_tokens(request: Request, fastapi_response: FastApiResponse):
     url_sub_path = "token"  # pragma: no mutate
-    details = {  # pragma: no mutate
+    details = {
         "grant_type": REFRESH_TOKEN_NAME,  # pragma: no mutate
         "refresh_token": get_refresh_token(request)  # pragma: no mutate
     }  # pragma: no mutate
@@ -149,7 +149,7 @@ def email_auth_call(
         request: AuthWithEmailRequest,
         url_sub_path: str
 ) -> Response:
-    details = {  # pragma: no mutate
+    details = {
         "email": request.email,  # pragma: no mutate
         "password": request.password,  # pragma: no mutate
         "returnSecureToken": True  # pragma: no mutate
