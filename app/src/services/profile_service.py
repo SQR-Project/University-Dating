@@ -39,5 +39,11 @@ def get_all_profiles() -> list[ProfileInformation]:
             age=age,
             primary_interest=primary_interest
         )
-        for (email, name, surname, age, primary_interest) in database.get_all_profiles()
+        for (
+            email,
+            name,
+            surname,
+            age,
+            primary_interest
+        ) in database.get_all_profiles()
     ]

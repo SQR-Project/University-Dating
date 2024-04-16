@@ -15,7 +15,9 @@ profile_router = APIRouter(
 @profile_router.post("/create", response_model=SuccessResponse)
 def create_profile(
         request: CreateProfileRequest,
-        token_data: VerifyAccessTokenResult = Depends(auth_service.verify_access_token)
+        token_data: VerifyAccessTokenResult = Depends(
+            auth_service.verify_access_token
+        )
 ):
     profile_validator.validate(request)
     return profile_service.create_profile(token_data, request)
@@ -23,7 +25,9 @@ def create_profile(
 
 @profile_router.delete("/", response_model=SuccessResponse)
 def delete_profile(
-        token_data: VerifyAccessTokenResult = Depends(auth_service.verify_access_token)
+        token_data: VerifyAccessTokenResult = Depends(
+            auth_service.verify_access_token
+        )
 ):
     return profile_service.delete_profile(token_data)
 

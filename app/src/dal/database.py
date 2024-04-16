@@ -21,7 +21,8 @@ class Database:
             name VARCHAR NOT NULL,
             surname VARCHAR NOT NULL,
             age REAL NOT NULL,
-            primary_interest TEXT CHECK(primary_interest IN ('sport', 'programming', 'music', 'reading', 'travel'))
+            primary_interest TEXT CHECK(primary_interest IN 
+            ('sport', 'programming', 'music', 'reading', 'travel'))
         );""")
         self.conn.commit()
 
@@ -32,7 +33,9 @@ class Database:
     ):
         cursor = self.conn.cursor()
         cursor.execute(
-            "INSERT INTO profiles (user_id, email, name, surname, age, primary_interest) VALUES (?, ?, ?, ?, ?, ?)",
+            """INSERT INTO profiles 
+            (user_id, email, name, surname, age, primary_interest)
+            VALUES (?, ?, ?, ?, ?, ?)""",
             (
                 token_data.user_id,
                 token_data.email,
@@ -53,5 +56,7 @@ class Database:
 
     def get_all_profiles(self):
         cursor = self.conn.cursor()
-        cursor.execute("SELECT email, name, surname, age, primary_interest FROM profiles")
+        cursor.execute(
+            "SELECT email, name, surname, age, primary_interest FROM profiles"
+        )
         return cursor.fetchall()
