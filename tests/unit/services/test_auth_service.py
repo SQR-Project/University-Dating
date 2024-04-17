@@ -174,8 +174,9 @@ def test_verify_access_token_success(mock_get_refresh_token, mock_id_token):
 
     # Assert
     assert result is not None
-    assert result["user_id"] == VALID_USER_ID
-    assert result["email"] == VALID_EMAIL
+    assert type(result) is auth_service.VerifyAccessTokenResult
+    assert result.user_id == VALID_USER_ID
+    assert result.email == VALID_EMAIL
 
 
 def test_get_refresh_token_no_token_in_cookie():
@@ -242,7 +243,7 @@ def test_refresh_auth_tokens_success(mock_post, mock_get_refresh_token):
     result = auth_service.refresh_auth_tokens(MagicMock(), MagicMock())
 
     # Assert
-    assert result == {"status": "success"}
+    assert result.status == "success"
 
 
 @patch("app.src.services.auth_service.verify_access_token")
@@ -298,7 +299,7 @@ def test_delete_auth_for_user_success(
     result = auth_service.delete_auth_for_user(MagicMock())
 
     # Assert
-    assert result == {"status": "success"}
+    assert result.status == "success"
 
 
 @patch("app.src.services.auth_service.email_auth_call")
@@ -321,7 +322,7 @@ def test_register(
     )
 
     # Assert
-    assert result == {"status": "success"}
+    assert result.status == "success"
 
 
 @patch("app.src.services.auth_service.email_auth_call")
@@ -344,4 +345,4 @@ def test_login(
     )
 
     # Assert
-    assert result == {"status": "success"}
+    assert result.status == "success"
