@@ -88,7 +88,8 @@ def delete_auth_for_user(request: Request):
 
     response = requests.post(
         f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",  # pragma: no mutate  # noqa: E501
-        data=details
+        data=details,
+        timeout=10
     )
 
     if "error" in response.json().keys():
@@ -112,7 +113,8 @@ def refresh_auth_tokens(request: Request, fastapi_response: FastApiResponse):
 
     response = requests.post(
         f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",  # pragma: no mutate  # noqa: E501
-        data=details
+        data=details,
+        timeout=10
     )
 
     if "error" in response.json().keys():
@@ -160,7 +162,8 @@ def email_auth_call(
 
     response = requests.post(
         f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",  # pragma: no mutate  # noqa: E501
-        data=details
+        data=details,
+        timeout=10
     )
 
     if "error" in response.json().keys():
