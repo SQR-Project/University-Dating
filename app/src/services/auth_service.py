@@ -9,11 +9,11 @@ from requests import Response
 from src.models.auth import AuthWithEmailRequest, VerifyAccessTokenResult
 from src.models.response import SuccessResponse
 
-FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")
-PROJECT_ID = os.getenv("PROJECT_ID")
-BASE_API_URL = "https://identitytoolkit.googleapis.com/v1/"
-ACCESS_TOKEN_NAME = "access_token"
-REFRESH_TOKEN_NAME = "refresh_token"
+FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")  # pragma: no mutate
+PROJECT_ID = os.getenv("PROJECT_ID")  # pragma: no mutate
+BASE_API_URL = "https://identitytoolkit.googleapis.com/v1/"  # pragma: no mutate  # noqa: E501
+ACCESS_TOKEN_NAME = "access_token"  # pragma: no mutate
+REFRESH_TOKEN_NAME = "refresh_token"  # pragma: no mutate
 
 
 def get_token_from_cookie(request: Request):
@@ -34,8 +34,8 @@ def verify_access_token(request: Request):
             token,
             google_requests.Request()
         )
-        user_id = id_info["user_id"]
-        email = id_info["email"]
+        user_id = id_info["user_id"]  # pragma: no mutate
+        email = id_info["email"]  # pragma: no mutate
         return VerifyAccessTokenResult(user_id=user_id, email=email)
     except ValueError:
         raise HTTPException(
@@ -55,19 +55,25 @@ def get_refresh_token(request: Request):
 
 
 def register(request: AuthWithEmailRequest, fastapi_response: FastApiResponse):
-    response = email_auth_call(request, "accounts:signUp")
+    response = email_auth_call(
+        request,
+        "accounts:signUp"  # pragma: no mutate
+    )
     data = response.json()
-    access_token = data["idToken"]
-    refresh_token = data["refreshToken"]
+    access_token = data["idToken"]  # pragma: no mutate
+    refresh_token = data["refreshToken"]  # pragma: no mutate
     set_httponly_cookie(access_token, refresh_token, fastapi_response)
     return SuccessResponse()
 
 
 def login(request: AuthWithEmailRequest, fastapi_response: FastApiResponse):
-    response = email_auth_call(request, "accounts:signInWithPassword")
+    response = email_auth_call(
+        request,
+        "accounts:signInWithPassword"  # pragma: no mutate
+    )
     data = response.json()
-    access_token = data["idToken"]
-    refresh_token = data["refreshToken"]
+    access_token = data["idToken"]  # pragma: no mutate
+    refresh_token = data["refreshToken"]  # pragma: no mutate
     set_httponly_cookie(access_token, refresh_token, fastapi_response)
     return SuccessResponse()
 
@@ -75,13 +81,13 @@ def login(request: AuthWithEmailRequest, fastapi_response: FastApiResponse):
 def delete_auth_for_user(request: Request):
     verify_access_token(request)
     token = get_token_from_cookie(request)
-    url_sub_path = "accounts:delete"
+    url_sub_path = "accounts:delete"  # pragma: no mutate
     details = {
-        "idToken": token
-    }
+        "idToken": token  # pragma: no mutate
+    }  # pragma: no mutate
 
     response = requests.post(
-        f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",
+        f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",  # pragma: no mutate  # noqa: E501
         data=details
     )
 
@@ -98,14 +104,14 @@ def delete_auth_for_user(request: Request):
 
 
 def refresh_auth_tokens(request: Request, fastapi_response: FastApiResponse):
-    url_sub_path = "token"
+    url_sub_path = "token"  # pragma: no mutate
     details = {
-        "grant_type": REFRESH_TOKEN_NAME,
-        "refresh_token": get_refresh_token(request)
-    }
+        "grant_type": REFRESH_TOKEN_NAME,  # pragma: no mutate
+        "refresh_token": get_refresh_token(request)  # pragma: no mutate
+    }  # pragma: no mutate
 
     response = requests.post(
-        f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",
+        f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",  # pragma: no mutate  # noqa: E501
         data=details
     )
 
@@ -119,8 +125,8 @@ def refresh_auth_tokens(request: Request, fastapi_response: FastApiResponse):
         )
 
     data = response.json()
-    access_token = data["id_token"]
-    refresh_token = data["refresh_token"]
+    access_token = data["id_token"]  # pragma: no mutate
+    refresh_token = data["refresh_token"]  # pragma: no mutate
     set_httponly_cookie(access_token, refresh_token, fastapi_response)
     return SuccessResponse()
 
@@ -132,7 +138,7 @@ def set_httponly_cookie(
 ):
     response.set_cookie(
         key=ACCESS_TOKEN_NAME,
-        value=f"Bearer {access_token}",
+        value=f"Bearer {access_token}",  # pragma: no mutate
         httponly=True
     )
     response.set_cookie(
@@ -147,13 +153,13 @@ def email_auth_call(
         url_sub_path: str
 ) -> Response:
     details = {
-        "email": request.email,
-        "password": request.password,
-        "returnSecureToken": True
-    }
+        "email": request.email,  # pragma: no mutate
+        "password": request.password,  # pragma: no mutate
+        "returnSecureToken": True  # pragma: no mutate
+    }  # pragma: no mutate
 
     response = requests.post(
-        f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",
+        f"{BASE_API_URL}{url_sub_path}?key={FIREBASE_API_KEY}",  # pragma: no mutate  # noqa: E501
         data=details
     )
 

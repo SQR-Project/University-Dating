@@ -18,6 +18,17 @@ def db_fixture():
     conn.close()
 
 
+def test_check(db_fixture):
+    # Arrange
+    db, conn = db_fixture
+
+    # Act
+    result = db.check()
+
+    # Assert
+    assert result is True
+
+
 def test_add_profile(db_fixture):
     # Arrange
     db, conn = db_fixture
@@ -28,7 +39,7 @@ def test_add_profile(db_fixture):
     request = CreateProfileRequest(
         name="Name",
         surname="Surname",
-        age=23,
+        age=100,
         primary_interest=Interest.MUSIC.value
     )
 
@@ -43,7 +54,7 @@ def test_add_profile(db_fixture):
     assert email == "user@innopolis.university"
     assert name == "Name"
     assert surname == "Surname"
-    assert age == 23
+    assert age == 100
     assert primary_interest == Interest.MUSIC.value
 
 
@@ -57,7 +68,7 @@ def test_add_profile_existing_account_raise_integrity_error(db_fixture):
     request = CreateProfileRequest(
         name="Name",
         surname="Surname",
-        age=23,
+        age=37,
         primary_interest=Interest.MUSIC.value
     )
     db.add_profile(token_data, request)
@@ -80,7 +91,7 @@ def test_delete_profile(db_fixture):
     request = CreateProfileRequest(
         name="Name",
         surname="Surname",
-        age=23,
+        age=55,
         primary_interest=Interest.MUSIC.value
     )
     db.add_profile(token_data, request)
@@ -103,7 +114,7 @@ def test_get_all_profiles(db_fixture):
     request_1 = CreateProfileRequest(
         name="Name",
         surname="Surname",
-        age=23,
+        age=67,
         primary_interest=Interest.MUSIC.value
     )
     db.add_profile(token_data_1, request_1)
@@ -129,7 +140,7 @@ def test_get_all_profiles(db_fixture):
     assert email == "user@innopolis.university"
     assert name == "Name"
     assert surname == "Surname"
-    assert age == 23
+    assert age == 67
     assert primary_interest == Interest.MUSIC.value
 
     (email, name, surname, age, primary_interest) = profiles[1]

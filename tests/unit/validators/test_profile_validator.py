@@ -5,12 +5,15 @@ from app.src.models.profile import CreateProfileRequest
 from app.src.validators import profile_validator
 
 
-def test_validate_success():
+@pytest.mark.parametrize("valid_age", [
+    11, 26, 100
+])
+def test_validate_success(valid_age):
     # Arrange
     request = CreateProfileRequest(
         name="Name",
         surname="Sur'Name",
-        age=25
+        age=valid_age
     )
 
     # Act
@@ -35,7 +38,9 @@ def test_validate_invalid_age_too_young():
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 400
-    assert "Age should be greater than 10" in exc_info.value.detail
+    assert (("CreateProfileRequest validation error. "
+            "Age should be greater than 10 amd less than 100")
+            == exc_info.value.detail)
 
 
 def test_validate_invalid_age_too_old():
@@ -53,7 +58,9 @@ def test_validate_invalid_age_too_old():
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 400
-    assert "less than 100" in exc_info.value.detail
+    assert (("CreateProfileRequest validation error. "
+            "Age should be greater than 10 amd less than 100")
+            == exc_info.value.detail)
 
 
 def test_validate_invalid_name():
@@ -71,7 +78,9 @@ def test_validate_invalid_name():
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 400
-    assert "Name and surname should consist of" in exc_info.value.detail
+    assert (("CreateProfileRequest validation error. "
+            "Name and surname should consist of: letters, -, ., and '")
+            == exc_info.value.detail)
 
 
 def test_validate_invalid_surname():
@@ -89,4 +98,6 @@ def test_validate_invalid_surname():
     # Assert
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 400
-    assert "Name and surname should consist of" in exc_info.value.detail
+    assert (("CreateProfileRequest validation error. "
+            "Name and surname should consist of: letters, -, ., and '")
+            == exc_info.value.detail)

@@ -6,6 +6,19 @@ from app.src.models.auth import VerifyAccessTokenResult
 from app.src.models.response import SuccessResponse
 
 
+def test_router_data():
+    assert auth.auth_router is not None
+    assert auth.auth_router.prefix == "/auth"
+
+    assert len(auth.auth_router.tags) == 1
+    assert auth.auth_router.tags[0] == "auth"
+
+    assert auth.auth_router.routes[0].path == "/auth/register"
+    assert auth.auth_router.routes[1].path == "/auth/login"
+    assert auth.auth_router.routes[2].path == "/auth/refresh"
+    assert auth.auth_router.routes[3].path == "/auth/auth-data"
+
+
 @patch("app.src.controllers.auth.email_validator.validate")
 @patch("app.src.controllers.auth.auth_service.register")
 def test_register(mock_register, mock_validate):
@@ -19,6 +32,7 @@ def test_register(mock_register, mock_validate):
     response = auth.register(request, MagicMock())
 
     # Assert
+    assert isinstance(response, SuccessResponse)
     assert response.status == "success"
 
 
@@ -35,6 +49,7 @@ def test_login(mock_login, mock_validate):
     response = auth.login(request, MagicMock())
 
     # Assert
+    assert isinstance(response, SuccessResponse)
     assert response.status == "success"
 
 
@@ -47,6 +62,7 @@ def test_refresh_tokens(mock_refresh_auth_tokens):
     response = auth.refresh_tokens(MagicMock(), MagicMock())
 
     # Assert
+    assert isinstance(response, SuccessResponse)
     assert response.status == "success"
 
 
@@ -64,4 +80,5 @@ def test_delete_auth_data(
     response = auth.delete_auth_data(MagicMock(), MagicMock())
 
     # Assert
+    assert isinstance(response, SuccessResponse)
     assert response.status == "success"

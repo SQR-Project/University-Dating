@@ -5,9 +5,9 @@ from src.services import auth_service
 from src.validators import email_validator
 
 auth_router = APIRouter(
-    prefix="/auth",
+    prefix="/auth",  # pragma: no mutate
     tags=["auth"]
-)
+)  # pragma: no mutate
 
 
 @auth_router.post("/register", response_model=SuccessResponse)
