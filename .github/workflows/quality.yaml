@@ -6,6 +6,11 @@ on:
       - 'app/**'
       - 'tests/**'
       - '.github/workflows/quality.yaml'
+  push:
+    paths:
+      - 'app/**'
+      - 'tests/**'
+      - '.github/workflows/quality.yaml'    
 
 env:
   COVERAGE_FAIL_UNDER: 85
