@@ -103,6 +103,27 @@ def test_delete_profile(db_fixture):
     # Assert
     assert len(profiles) == 0
 
+def test_unsafe_get_profile_by_email(db_fixture):
+    # Arrange
+    db, conn = db_fixture
+    token_data = VerifyAccessTokenResult(
+        user_id="1",
+        email="user@innopolis.university"
+    )
+    request = CreateProfileRequest(
+        name="Name",
+        surname="Surname",
+        age=55,
+        primary_interest=Interest.MUSIC.value
+    )
+    db.add_profile(token_data, request)
+
+    # Act
+    profile_id = db.unsafe_get_profile_by_email("user@innopolis.university")
+
+    # Assert
+    assert profile_id == "1"
+
 
 def test_get_all_profiles(db_fixture):
     # Arrange
