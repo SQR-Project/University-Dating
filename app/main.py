@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from src.controllers.auth import auth_router
 from src.controllers.profile import profile_router
 from src.controllers.status import status_router
+from src.ui import login
 
 app = FastAPI()
 
@@ -25,3 +26,5 @@ async def exception_handler(request, err):
 app.include_router(auth_router)
 app.include_router(profile_router)
 app.include_router(status_router)
+
+login.app()

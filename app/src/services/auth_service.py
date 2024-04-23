@@ -16,19 +16,20 @@ ACCESS_TOKEN_NAME = "access_token"  # pragma: no mutate
 REFRESH_TOKEN_NAME = "refresh_token"  # pragma: no mutate
 
 
-def get_token_from_cookie(request: Request):
-    authorization = request.cookies.get(ACCESS_TOKEN_NAME)
+def get_token_from_cookie_string(authorization: str):
     if not authorization:
         raise HTTPException(
             status_code=401,
             detail="Authorization token missing"
         )
-
     return authorization.split(" ")[1]
 
+def get_token_from_cookie(request: Request):
+    authorization = request.cookies.get(ACCESS_TOKEN_NAME)
+    get_token_from_cookie_string(authorization)
 
-def verify_access_token(request: Request):
-    token = get_token_from_cookie(request)
+def verify_access_token_string(authorization: str):
+    token = get_token_from_cookie_string(authorization)
     try:
         id_info = id_token.verify_firebase_token(
             token,
@@ -42,6 +43,10 @@ def verify_access_token(request: Request):
             status_code=401,
             detail="Invalid ID token"
         )
+
+def verify_access_token(request: Request):
+    token = get_token_from_cookie(request)
+    verify_access_token_string(token)
 
 
 def get_refresh_token(request: Request):

@@ -67,3 +67,11 @@ class Database:
             "SELECT email, name, surname, age, primary_interest FROM profiles"
         )
         return cursor.fetchall()
+
+    def get_profile_by_email(self, email: str):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT email, name, surname, age, primary_interest FROM profiles WHERE email = ?",
+            email
+        )
+        return cursor.fetchall()

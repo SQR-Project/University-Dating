@@ -11,7 +11,9 @@ def create_profile(
         token_data: VerifyAccessTokenResult,
         request: CreateProfileRequest
 ):
+    print("I am here")
     database = Database()
+    print("I am here")
     try:
         database.add_profile(token_data, request)
     except sqlite3.IntegrityError:
@@ -47,3 +49,28 @@ def get_all_profiles() -> list[ProfileInformation]:
             primary_interest
         ) in database.get_all_profiles()
     ]
+
+def get_profile_by_email(email: str) -> ProfileInformation:
+    database = Database()
+    profiles = [
+        ProfileInformation(
+            email=email,
+            name=name,
+            surname=surname,
+            age=age,
+            primary_interest=primary_interest
+        )
+        for (
+            email,
+            name,
+            surname,
+            age,
+            primary_interest
+        ) in database.get_profile_by_email(email)
+    ]
+    if len(profiles) == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Profile does not exist"
+        )
+    return profiles[0]
