@@ -20,4 +20,4 @@ WORKDIR /dating-app/app
 
 EXPOSE $PORT
 
-CMD $VENV_PATH/bin/poetry run uvicorn main:app --host 0.0.0.0 --port $PORT --reload
+CMD $VENV_PATH/bin/poetry run uvicorn main:app --host 0.0.0.0 --port 8080 --reload

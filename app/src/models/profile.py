@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from src.enums.interests_enum import Interest
+from app.src.enums.interests_enum import Interest
 
 
 class CreateProfileRequest(BaseModel):
@@ -12,3 +12,4 @@ class CreateProfileRequest(BaseModel):
 
 class ProfileInformation(CreateProfileRequest):
     email: str
+    liked_profiles: str

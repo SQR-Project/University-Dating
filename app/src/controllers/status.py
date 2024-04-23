@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from src.dal.database import Database
+from app.src.dal.database import Database
 
 status_router = APIRouter(
     prefix="/status",  # pragma: no mutate

@@ -1,10 +1,10 @@
 import sqlite3
 
 from fastapi import HTTPException
-from src.dal.database import Database
-from src.models.auth import VerifyAccessTokenResult
-from src.models.profile import CreateProfileRequest, ProfileInformation
-from src.models.response import SuccessResponse
+from app.src.dal.database import Database
+from app.src.models.auth import VerifyAccessTokenResult
+from app.src.models.profile import CreateProfileRequest, ProfileInformation
+from app.src.models.response import SuccessResponse
 
 
 def create_profile(
@@ -37,6 +37,7 @@ def get_all_profiles() -> list[ProfileInformation]:
             name=name,
             surname=surname,
             age=age,
+            liked_profiles=liked_profiles,
             primary_interest=primary_interest
         )
         for (
@@ -44,6 +45,7 @@ def get_all_profiles() -> list[ProfileInformation]:
             name,
             surname,
             age,
+            liked_profiles,
             primary_interest
         ) in database.get_all_profiles()
     ]

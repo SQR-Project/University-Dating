@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Response, Request, Depends
-from src.models.auth import AuthWithEmailRequest, VerifyAccessTokenResult
-from src.models.response import SuccessResponse
-from src.services import auth_service
-from src.validators import email_validator
+from app.src.models.auth import AuthWithEmailRequest, VerifyAccessTokenResult
+from app.src.models.response import SuccessResponse
+from app.src.services import auth_service
+from app.src.validators import email_validator
 
 auth_router = APIRouter(
     prefix="/auth",  # pragma: no mutate

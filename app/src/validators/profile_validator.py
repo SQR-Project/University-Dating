@@ -2,7 +2,7 @@ import re
 
 from fastapi import HTTPException
 
-from src.models.profile import CreateProfileRequest
+from app.src.models.profile import CreateProfileRequest
 
 NAME_PATTERN_STR = r"^[\w.'-]+$"  # pragma: no mutate
 NAME_PATTERN = re.compile(NAME_PATTERN_STR)

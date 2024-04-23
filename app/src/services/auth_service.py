@@ -6,8 +6,8 @@ from fastapi import Response as FastApiResponse
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from requests import Response
-from src.models.auth import AuthWithEmailRequest, VerifyAccessTokenResult
-from src.models.response import SuccessResponse
+from app.src.models.auth import AuthWithEmailRequest, VerifyAccessTokenResult
+from app.src.models.response import SuccessResponse
 
 FIREBASE_API_KEY = os.getenv("FIREBASE_API_KEY")  # pragma: no mutate
 PROJECT_ID = os.getenv("PROJECT_ID")  # pragma: no mutate

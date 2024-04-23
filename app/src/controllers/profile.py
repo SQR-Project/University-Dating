@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 
-from src.models.auth import VerifyAccessTokenResult
-from src.models.profile import CreateProfileRequest, ProfileInformation
-from src.models.response import SuccessResponse
-from src.services import auth_service, profile_service
-from src.validators import profile_validator
+from app.src.models.auth import VerifyAccessTokenResult
+from app.src.models.profile import CreateProfileRequest, ProfileInformation
+from app.src.models.response import SuccessResponse
+from app.src.services import auth_service, profile_service
+from app.src.validators import profile_validator
 
 profile_router = APIRouter(
     prefix="/profile",  # pragma: no mutate

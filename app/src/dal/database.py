@@ -2,9 +2,8 @@ import os
 
 import sqlite3
 
-from src.models.auth import VerifyAccessTokenResult
-from src.models.profile import CreateProfileRequest
-
+from app.src.models.auth import VerifyAccessTokenResult
+from app.src.models.profile import CreateProfileRequest
 
 class Database:
     def __init__(self):
@@ -21,6 +20,7 @@ class Database:
             name VARCHAR NOT NULL,
             surname VARCHAR NOT NULL,
             age REAL NOT NULL,
+            liked_profiles VARCHAR NOT NULL,
             primary_interest TEXT CHECK(primary_interest IN
             ('sport', 'programming', 'music', 'reading', 'travel'))
         );""")
@@ -41,14 +41,15 @@ class Database:
         cursor = self.conn.cursor()
         cursor.execute(
             """INSERT INTO profiles
-            (user_id, email, name, surname, age, primary_interest)
-            VALUES (?, ?, ?, ?, ?, ?)""",
+            (user_id, email, name, surname, age, liked_profiles, primary_interest)
+            VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (
                 token_data.user_id,
                 token_data.email,
                 request.name,
                 request.surname,
                 request.age,
+                token_data.email,
                 request.primary_interest.value
             )
         )
@@ -64,6 +65,39 @@ class Database:
     def get_all_profiles(self):
         cursor = self.conn.cursor()
         cursor.execute(
-            "SELECT email, name, surname, age, primary_interest FROM profiles"
+            "SELECT email, name, surname, age, liked_profiles, primary_interest FROM profiles"
         )
         return cursor.fetchall()
+
+    def get_profile_likes_by_user_id(self, user_id: str):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT liked_profiles, FROM profiles WHERE user_id = ?",
+            (user_id)
+        )
+        return cursor.fetchall()  
+
+    def unsafe_get_profile_by_email(self, email: str):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT user_id FROM profiles WHERE email = ?",
+            (email)
+        )
+        return cursor.fetchall()
+    
+
+    def update_profile_likes(
+            self, 
+            token_data: VerifyAccessTokenResult, 
+            updated_likes: str
+    ):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            """UPDATE profiles
+            SET liked_profiles = ? WHERE user_id = ?""",
+            (
+                token_data.user_id,
+                updated_likes
+            )
+        )
+        self.conn.commit()
