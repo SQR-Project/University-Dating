@@ -72,6 +72,6 @@ class Database:
         cursor = self.conn.cursor()
         cursor.execute(
             "SELECT email, name, surname, age, primary_interest FROM profiles WHERE email = ?",
-            email
+            (email,)
         )
         return cursor.fetchall()

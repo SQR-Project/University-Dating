@@ -25,6 +25,7 @@ bandit = {extras = ["toml"], version = "^1.7.8"}
 pydantic = "^2.6.4"
 google-auth = "^2.29.0"
 extra-streamlit-components = "^0.1.71"
+streamlit-option-menu = "^0.3.12"
 
 
 [build-system]
