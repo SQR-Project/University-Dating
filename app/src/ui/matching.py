@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 def main():
     # Массив с путями к картинкам
     images = [
@@ -13,7 +14,7 @@ def main():
     while True:
         st.title("Галерея изображений")
         st.image(images[current_image_index], use_column_width=True)
-        
+
         # Вывод кнопок для листания изображений
         if current_image_index > 0:
             st.button("Предыдущая", key='prev_button')
@@ -31,6 +32,7 @@ def main():
         # Блокировка обновления страницы при изменении состояния
         st.experimental_set_query_params(button_clicked=None)
         st.stop()
+
 
 if __name__ == "__main__":
     main()

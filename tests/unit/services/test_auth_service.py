@@ -175,7 +175,10 @@ def test_verify_access_token_token_verification_error(
 
 @patch("app.src.services.auth_service.id_token")
 @patch("app.src.services.auth_service.get_token_from_cookie")
-def test_verify_access_token_success(mock_get_token_from_cookie, mock_id_token):
+def test_verify_access_token_success(
+        mock_get_token_from_cookie,
+        mock_id_token
+):
     # Arrange
     request = MagicMock()
     mock_get_token_from_cookie.return_value = f"Bearer {VALID_ACCESS_TOKEN}"

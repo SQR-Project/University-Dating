@@ -103,6 +103,7 @@ def test_delete_profile(db_fixture):
     # Assert
     assert len(profiles) == 0
 
+
 def test_unsafe_get_profile_by_email(db_fixture):
     # Arrange
     db, conn = db_fixture

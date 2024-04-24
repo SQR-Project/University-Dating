@@ -18,7 +18,7 @@ def register(request: LikeProfileRequest):
 
 @matching_router.post("/is-matched", response_model=MatchingResponse)
 def login(
-        request: LikeProfileRequest, 
+        request: LikeProfileRequest,
         token_data: VerifyAccessTokenResult = Depends(
             auth_service.verify_access_token
         )

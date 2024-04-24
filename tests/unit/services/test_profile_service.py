@@ -33,11 +33,12 @@ def test_create_profile(mock_db):
     # Assert
     assert isinstance(response, profile_service.SuccessResponse)
     assert response.status == "success"
-    mock_db.return_value.add_profile.assert_called_once_with(VALID_TOKEN_DATA, request)
+    mock_db.return_value.add_profile.assert_called_once_with(
+        VALID_TOKEN_DATA, request)
 
 
 @patch('app.src.services.profile_service.Database')
-def test_create_profile_db_throws_integrity_error_raise_http_exception(mock_db):
+def test_create_profile_db_throws_integrity_error_http_exception(mock_db):
     # Arrange
     request = VALID_CREATE_PROFILE_REQUEST
     mock_db.return_value.add_profile.side_effect = IntegrityError()
@@ -50,7 +51,8 @@ def test_create_profile_db_throws_integrity_error_raise_http_exception(mock_db):
     assert type(exc_info.value) is HTTPException
     assert exc_info.value.status_code == 400
     assert "Profile already exists" == exc_info.value.detail
-    mock_db.return_value.add_profile.assert_called_once_with(VALID_TOKEN_DATA, request)
+    mock_db.return_value.add_profile.assert_called_once_with(
+        VALID_TOKEN_DATA, request)
 
 
 @patch('app.src.services.profile_service.Database')
@@ -64,7 +66,8 @@ def test_delete_profile(mock_db):
     # Assert
     assert isinstance(response, profile_service.SuccessResponse)
     assert response.status == "success"
-    mock_db.return_value.delete_profile.assert_called_once_with(VALID_TOKEN_DATA)
+    mock_db.return_value.delete_profile.assert_called_once_with(
+        VALID_TOKEN_DATA)
 
 
 @patch('app.src.services.profile_service.Database')
@@ -72,7 +75,8 @@ def test_get_all_profiles(mock_db):
     # Arrange
     profiles_data = [
         ("user@innopolis.ru", "Name", "Surname", 25, Interest.MUSIC.value),
-        ("user@innopolis.university", "Name2", "Surname2", 28, Interest.SPORT.value)
+        ("user@innopolis.university", "Name2",
+         "Surname2", 28, Interest.SPORT.value)
     ]
     mock_db.return_value.get_all_profiles.return_value = profiles_data
 
@@ -81,7 +85,8 @@ def test_get_all_profiles(mock_db):
 
     # Assert
     assert len(response) == 2
-    assert all(isinstance(p, profile_service.ProfileInformation) for p in response)
+    assert all(isinstance(p, profile_service.ProfileInformation)
+               for p in response)
 
     assert response[0].email == "user@innopolis.ru"
     assert response[0].name == "Name"

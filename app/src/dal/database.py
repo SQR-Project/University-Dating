@@ -5,6 +5,7 @@ import sqlite3
 from app.src.models.auth import VerifyAccessTokenResult
 from app.src.models.profile import CreateProfileRequest
 
+
 class Database:
     def __init__(self):
         self.db_path = os.getenv("DB_PATH")
@@ -41,7 +42,13 @@ class Database:
         cursor = self.conn.cursor()
         cursor.execute(
             """INSERT INTO profiles
-            (user_id, email, name, surname, age, liked_profiles, primary_interest)
+            (user_id,
+            email,
+            name,
+            surname,
+            age,
+            liked_profiles,
+            primary_interest)
             VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (
                 token_data.user_id,
@@ -65,7 +72,13 @@ class Database:
     def get_all_profiles(self):
         cursor = self.conn.cursor()
         cursor.execute(
-            "SELECT email, name, surname, age, liked_profiles, primary_interest FROM profiles"
+            """SELECT email,
+                      name,
+                      surname,
+                      age,
+                      liked_profiles,
+                      primary_interest
+                      FROM profiles"""
         )
         return cursor.fetchall()
 
@@ -75,7 +88,7 @@ class Database:
             "SELECT liked_profiles, FROM profiles WHERE user_id = ?",
             (user_id)
         )
-        return cursor.fetchall()  
+        return cursor.fetchall()
 
     def unsafe_get_profile_by_email(self, email: str):
         cursor = self.conn.cursor()
@@ -84,11 +97,10 @@ class Database:
             (email)
         )
         return cursor.fetchall()
-    
 
     def update_profile_likes(
-            self, 
-            token_data: VerifyAccessTokenResult, 
+            self,
+            token_data: VerifyAccessTokenResult,
             updated_likes: str
     ):
         cursor = self.conn.cursor()

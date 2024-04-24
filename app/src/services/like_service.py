@@ -1,6 +1,3 @@
-import sqlite3
-
-from fastapi import HTTPException
 from app.src.dal.database import Database
 from app.src.models.auth import VerifyAccessTokenResult
 from app.src.models.response import SuccessResponse
@@ -17,12 +14,13 @@ def like_profile(
     database.update_profile_likes(token_data, updated_likes)
     return SuccessResponse()
 
+
 def is_matched(
-        token_data: VerifyAccessTokenResult, 
+        token_data: VerifyAccessTokenResult,
         request: LikeProfileRequest
 ):
     database = Database()
     liked_person_id = database.unsafe_get_profile_by_email(request.email)
-    liked_person_likes = database.get_profile_likes_by_user_id(liked_person_id).split(',')
+    liked_person_likes = database.get_profile_likes_by_user_id(
+        liked_person_id).split(',')
     MatchingResponse(token_data.email in liked_person_likes)
-    

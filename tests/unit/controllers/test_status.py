@@ -1,9 +1,6 @@
-import uuid
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from app.src.controllers import status
-from app.src.models.auth import VerifyAccessTokenResult
-from app.src.models.response import SuccessResponse
 
 
 def test_router_data():

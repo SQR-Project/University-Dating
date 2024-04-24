@@ -74,7 +74,8 @@ def test_delete_auth_data(
 ):
     # Arrange
     mock_delete_auth_for_user.return_value = SuccessResponse()
-    mock_verify_access_token.return_value = VerifyAccessTokenResult(user_id="UserId", email="Email")
+    mock_verify_access_token.return_value = VerifyAccessTokenResult(
+        user_id="UserId", email="Email")
 
     # Act
     response = auth.delete_auth_data(MagicMock(), MagicMock())
