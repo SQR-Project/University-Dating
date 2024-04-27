@@ -68,6 +68,7 @@ def test_get_all_profiles(mock_get_all_profiles, mock_verify_access_token):
         email="Email",
         name="Name",
         surname="Surname",
+        liked_profiles = "Email",
         age=11
     )]
 

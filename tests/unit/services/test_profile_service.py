@@ -74,9 +74,9 @@ def test_delete_profile(mock_db):
 def test_get_all_profiles(mock_db):
     # Arrange
     profiles_data = [
-        ("user@innopolis.ru", "Name", "Surname", 25, Interest.MUSIC.value),
+        ("user@innopolis.ru", "Name", "Surname", 25, "aboba", Interest.MUSIC.value),
         ("user@innopolis.university", "Name2",
-         "Surname2", 28, Interest.SPORT.value)
+         "Surname2", 28, "aboba", Interest.SPORT.value)
     ]
     mock_db.return_value.get_all_profiles.return_value = profiles_data
 
@@ -92,12 +92,14 @@ def test_get_all_profiles(mock_db):
     assert response[0].name == "Name"
     assert response[0].surname == "Surname"
     assert response[0].age == 25
+    assert response[0].liked_profiles == "aboba"
     assert response[0].primary_interest.value == Interest.MUSIC.value
 
     assert response[1].email == "user@innopolis.university"
     assert response[1].name == "Name2"
     assert response[1].surname == "Surname2"
     assert response[1].age == 28
+    assert response[1].liked_profiles == "aboba"
     assert response[1].primary_interest.value == Interest.SPORT.value
 
     mock_db.return_value.get_all_profiles.assert_called_once()

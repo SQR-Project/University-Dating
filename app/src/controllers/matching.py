@@ -12,12 +12,17 @@ matching_router = APIRouter(
 
 
 @matching_router.post("/like", response_model=SuccessResponse)
-def register(request: LikeProfileRequest):
-    return like_service.like_profile(request)
+def like(
+        request: LikeProfileRequest,
+        token_data: VerifyAccessTokenResult = Depends(
+            auth_service.verify_access_token
+        )
+):
+    return like_service.like_profile(token_data, request)
 
 
 @matching_router.post("/is-matched", response_model=MatchingResponse)
-def login(
+def is_matched(
         request: LikeProfileRequest,
         token_data: VerifyAccessTokenResult = Depends(
             auth_service.verify_access_token

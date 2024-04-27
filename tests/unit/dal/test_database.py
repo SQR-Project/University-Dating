@@ -50,11 +50,12 @@ def test_add_profile(db_fixture):
     # Assert
     assert len(profiles) == 1
 
-    (email, name, surname, age, primary_interest) = profiles[0]
+    (email, name, surname, age, liked_profiles, primary_interest) = profiles[0]
     assert email == "user@innopolis.university"
     assert name == "Name"
     assert surname == "Surname"
     assert age == 100
+    assert liked_profiles == "user@innopolis.university"
     assert primary_interest == Interest.MUSIC.value
 
 
@@ -123,8 +124,50 @@ def test_unsafe_get_profile_by_email(db_fixture):
     profile_id = db.unsafe_get_profile_by_email("user@innopolis.university")
 
     # Assert
-    assert profile_id == "1"
+    assert profile_id[0][0] == "1"
 
+def test_get_profile_likes_by_user_id(db_fixture):
+    # Arrange
+    db, conn = db_fixture
+    token_data = VerifyAccessTokenResult(
+        user_id="1",
+        email="user@innopolis.university"
+    )
+    request = CreateProfileRequest(
+        name="Name",
+        surname="Surname",
+        age=55,
+        primary_interest=Interest.MUSIC.value
+    )
+    db.add_profile(token_data, request)
+
+    # Act
+    updates_likes = db.get_profile_likes_by_user_id(token_data.user_id)
+
+    # Assert
+    assert updates_likes[0][0] == token_data.email
+
+def test_update_profile_likes(db_fixture):
+    # Arrange
+    db, conn = db_fixture
+    token_data = VerifyAccessTokenResult(
+        user_id="1",
+        email="user@innopolis.university"
+    )
+    request = CreateProfileRequest(
+        name="Name",
+        surname="Surname",
+        age=55,
+        primary_interest=Interest.MUSIC.value
+    )
+    db.add_profile(token_data, request)
+    new_likes = "Masha,Sasha"
+
+    # Act
+    db.update_profile_likes(token_data, new_likes)
+    updated_likes = db.get_profile_likes_by_user_id(token_data.user_id)
+    # Assert
+    assert updated_likes[0][0] == new_likes
 
 def test_get_all_profiles(db_fixture):
     # Arrange
@@ -158,16 +201,18 @@ def test_get_all_profiles(db_fixture):
     # Assert
     assert len(profiles) == 2
 
-    (email, name, surname, age, primary_interest) = profiles[0]
+    (email, name, surname, age, liked_profiles, primary_interest) = profiles[0]
     assert email == "user@innopolis.university"
     assert name == "Name"
     assert surname == "Surname"
     assert age == 67
+    assert liked_profiles == "user@innopolis.university"
     assert primary_interest == Interest.MUSIC.value
 
-    (email, name, surname, age, primary_interest) = profiles[1]
+    (email, name, surname, age, liked_profiles, primary_interest) = profiles[1]
     assert email == "user@innopolis.ru"
     assert name == "Name2"
     assert surname == "Surname2"
     assert age == 45
+    assert liked_profiles == "user@innopolis.ru"
     assert primary_interest == Interest.PROGRAMMING.value

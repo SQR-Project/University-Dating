@@ -85,8 +85,8 @@ class Database:
     def get_profile_likes_by_user_id(self, user_id: str):
         cursor = self.conn.cursor()
         cursor.execute(
-            "SELECT liked_profiles, FROM profiles WHERE user_id = ?",
-            (user_id)
+            "SELECT liked_profiles FROM profiles WHERE user_id = ?",
+            (user_id,)
         )
         return cursor.fetchall()
 
@@ -94,7 +94,7 @@ class Database:
         cursor = self.conn.cursor()
         cursor.execute(
             "SELECT user_id FROM profiles WHERE email = ?",
-            (email)
+            (email,)
         )
         return cursor.fetchall()
 
@@ -108,8 +108,8 @@ class Database:
             """UPDATE profiles
             SET liked_profiles = ? WHERE user_id = ?""",
             (
-                token_data.user_id,
-                updated_likes
+                updated_likes,
+                token_data.user_id
             )
         )
         self.conn.commit()
