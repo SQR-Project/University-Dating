@@ -82,6 +82,14 @@ class Database:
         )
         return cursor.fetchall()
 
+    def get_profile_by_email(self, email: str):
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT email, name, surname, age, liked_profiles, primary_interest FROM profiles WHERE email = ?",
+            email
+        )
+        return cursor.fetchall()
+
     def get_profile_likes_by_user_id(self, user_id: str):
         cursor = self.conn.cursor()
         cursor.execute(

@@ -49,3 +49,30 @@ def get_all_profiles() -> list[ProfileInformation]:
             primary_interest
         ) in database.get_all_profiles()
     ]
+
+def get_profile_by_email(email: str) -> ProfileInformation:
+    database = Database()
+    profiles = [
+        ProfileInformation(
+            email=email,
+            name=name,
+            surname=surname,
+            age=age,
+            liked_profiles=liked_profiles,
+            primary_interest=primary_interest
+        )
+        for (
+            email,
+            name,
+            surname,
+            age,
+            liked_profiles,
+            primary_interest
+        ) in database.get_profile_by_email(email)
+    ]
+    if len(profiles) == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Profile does not exist"
+        )
+    return profiles[0]
