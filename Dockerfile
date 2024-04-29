@@ -1,4 +1,4 @@
-FROM ubuntu:latest as build
+FROM ubuntu:jammy as build
 
 ENV VENV_PATH=/venv-dating-app
 
