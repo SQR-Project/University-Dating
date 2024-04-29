@@ -12,6 +12,7 @@ Result:
 
 ## Tests Coverage
 
+```
 Name                                      Stmts   Miss Branch BrPart  Cover
 ---------------------------------------------------------------------------
 app/main.py                                  17      2      2      0    89%
@@ -35,6 +36,7 @@ app/src/validators/profile_validator.py      13      0      4      0   100%
 app/ui_app.py                                17     17      6      0     0%
 ---------------------------------------------------------------------------
 TOTAL                                       461     24     68      1    94%
+```
 
 ## Performance testing
 
