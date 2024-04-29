@@ -13,14 +13,15 @@ def like_profile(
 ):
     database = Database()
     try:
-        profile_likes = database.get_profile_likes_by_user_id(token_data.user_id)
+        profile_likes = database.get_profile_likes_by_user_id(
+            token_data.user_id)
         updated_likes = str(profile_likes) + f',{request.email}'
         database.update_profile_likes(token_data, updated_likes)
     except sqlite3.IntegrityError:
         raise HTTPException(
             status_code=400,
             detail="Profile does not exists"
-        )    
+        )
     return SuccessResponse()
 
 
@@ -38,5 +39,5 @@ def is_matched(
         raise HTTPException(
             status_code=400,
             detail="Profile does not exists"
-        )        
-    return MatchingResponse(matched = token_data.email in liked_person_likes)
+        )
+    return MatchingResponse(matched=token_data.email in liked_person_likes)

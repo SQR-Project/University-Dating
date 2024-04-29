@@ -25,9 +25,11 @@ def get_token_from_cookie_string(authorization: str):
 
     return authorization.split(" ")[1]
 
+
 def get_token_from_cookie(request: Request):
     authorization = request.cookies.get(ACCESS_TOKEN_NAME)
     return get_token_from_cookie_string(authorization)
+
 
 def verify_access_token_string(authorization: str):
     token = get_token_from_cookie_string(authorization)
@@ -45,9 +47,11 @@ def verify_access_token_string(authorization: str):
             detail="Invalid ID token"
         )
 
+
 def verify_access_token(request: Request):
     token = get_token_from_cookie(request)
     return verify_access_token_string(token)
+
 
 def get_refresh_token(request: Request):
     refresh_token = request.cookies.get(REFRESH_TOKEN_NAME)

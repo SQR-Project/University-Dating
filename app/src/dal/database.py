@@ -8,6 +8,7 @@ from app.src.models.profile import CreateProfileRequest
 
 class Database:
     def __init__(self):
+        os.environ["DB_PATH"] = ":memory:"
         self.db_path = os.getenv("DB_PATH")
         self.conn = sqlite3.connect(self.db_path)
         self._init_db()
@@ -85,8 +86,14 @@ class Database:
     def get_profile_by_email(self, email: str):
         cursor = self.conn.cursor()
         cursor.execute(
-            "SELECT email, name, surname, age, liked_profiles, primary_interest FROM profiles WHERE email = ?",
-            email
+            """SELECT email,
+            name,
+            surname,
+            age,
+            liked_profiles,
+            primary_interest
+            FROM profiles WHERE email = ?""",
+            (email, )
         )
         return cursor.fetchall()
 

@@ -1,11 +1,10 @@
 from unittest.mock import patch, MagicMock
 
 from app.src.controllers import matching
-from app.src.enums.interests_enum import Interest
 from app.src.models.auth import VerifyAccessTokenResult
-from app.src.models.profile import ProfileInformation
 from app.src.models.response import SuccessResponse
 from app.src.models.like import MatchingResponse
+
 
 def test_router_data():
     assert matching.matching_router is not None
@@ -42,14 +41,14 @@ def test_like(
 @patch("app.src.controllers.matching.like_service.is_matched")
 def test_is_matched(mock_is_matched, mock_verify_access_token):
     # Arrange
-    mock_is_matched.return_value = MatchingResponse(matched = True)
+    mock_is_matched.return_value = MatchingResponse(matched=True)
     mock_verify_access_token.return_value = VerifyAccessTokenResult(
         user_id="UserId", email="Email")
-    
+
     # Act
     request = MagicMock()
     response = matching.is_matched(request)
 
     # Assert
     assert isinstance(response, MatchingResponse)
-    assert response.matched == True
+    assert response.matched is True

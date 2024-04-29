@@ -74,7 +74,8 @@ def test_delete_profile(mock_db):
 def test_get_all_profiles(mock_db):
     # Arrange
     profiles_data = [
-        ("user@innopolis.ru", "Name", "Surname", 25, "aboba", Interest.MUSIC.value),
+        ("user@innopolis.ru", "Name", "Surname", 25,
+         "aboba", Interest.MUSIC.value),
         ("user@innopolis.university", "Name2",
          "Surname2", 28, "aboba", Interest.SPORT.value)
     ]
@@ -103,3 +104,43 @@ def test_get_all_profiles(mock_db):
     assert response[1].primary_interest.value == Interest.SPORT.value
 
     mock_db.return_value.get_all_profiles.assert_called_once()
+
+
+@patch('app.src.services.profile_service.Database')
+def test_get_profile_by_email(mock_db):
+    # Arrange
+    profile_data = [("user@innopolis.ru", "Name", "Surname",
+                     25, "aboba", Interest.MUSIC.value)]
+
+    mock_db.return_value.get_profile_by_email.return_value = profile_data
+
+    # Act
+    response = profile_service.get_profile_by_email("user@innopolis.ru")
+
+    # Assert
+    assert response.email == "user@innopolis.ru"
+    assert response.name == "Name"
+    assert response.surname == "Surname"
+    assert response.age == 25
+    assert response.liked_profiles == "aboba"
+    assert response.primary_interest.value == Interest.MUSIC.value
+
+    mock_db.return_value.get_profile_by_email.assert_called_once()
+
+
+@patch('app.src.services.profile_service.Database')
+def test_get_profile_by_email_db_throws_exception(mock_db):
+    # Arrange
+    profile_data = []
+
+    mock_db.return_value.get_profile_by_email.return_value = profile_data
+
+    # Act
+    with pytest.raises(Exception) as exc_info:
+        profile_service.get_profile_by_email("user@innopolis.ru")
+
+    # Assert
+    assert type(exc_info.value) is HTTPException
+    assert exc_info.value.status_code == 400
+    assert "Profile does not exist" == exc_info.value.detail
+    mock_db.return_value.get_profile_by_email.assert_called_once()

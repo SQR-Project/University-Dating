@@ -126,6 +126,34 @@ def test_unsafe_get_profile_by_email(db_fixture):
     # Assert
     assert profile_id[0][0] == "1"
 
+
+def test_get_profile_by_email(db_fixture):
+    # Arrange
+    db, conn = db_fixture
+    token_data = VerifyAccessTokenResult(
+        user_id="1",
+        email="user@innopolis.university"
+    )
+    request = CreateProfileRequest(
+        name="Name",
+        surname="Surname",
+        age=55,
+        primary_interest=Interest.MUSIC.value
+    )
+    db.add_profile(token_data, request)
+
+    # Act
+    profile = db.get_profile_by_email("user@innopolis.university")
+
+    # Assert
+    assert profile[0][0] == "user@innopolis.university"
+    assert profile[0][1] == "Name"
+    assert profile[0][2] == "Surname"
+    assert profile[0][3] == 55
+    assert profile[0][4] == "user@innopolis.university"
+    assert profile[0][5] == Interest.MUSIC.value
+
+
 def test_get_profile_likes_by_user_id(db_fixture):
     # Arrange
     db, conn = db_fixture
@@ -146,6 +174,7 @@ def test_get_profile_likes_by_user_id(db_fixture):
 
     # Assert
     assert updates_likes[0][0] == token_data.email
+
 
 def test_update_profile_likes(db_fixture):
     # Arrange
@@ -168,6 +197,7 @@ def test_update_profile_likes(db_fixture):
     updated_likes = db.get_profile_likes_by_user_id(token_data.user_id)
     # Assert
     assert updated_likes[0][0] == new_likes
+
 
 def test_get_all_profiles(db_fixture):
     # Arrange

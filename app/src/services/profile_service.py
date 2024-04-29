@@ -50,6 +50,7 @@ def get_all_profiles() -> list[ProfileInformation]:
         ) in database.get_all_profiles()
     ]
 
+
 def get_profile_by_email(email: str) -> ProfileInformation:
     database = Database()
     profiles = [

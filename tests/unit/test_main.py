@@ -13,5 +13,7 @@ ROUTERS_COUNT = AUTH_ROUTES_COUNT \
 
 
 def test_app_routes_count():
-    api_routes = list(filter(lambda x: type(x) is APIRoute, application.routes))
+    api_routes = list(
+        filter(lambda x: type(x) is APIRoute, application.routes)
+    )
     assert len(api_routes) == ROUTERS_COUNT
