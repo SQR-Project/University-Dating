@@ -57,4 +57,5 @@ pythonpath = [
 [tool.flake8]
 per-file-ignores = [
     './app/src/ui/*:C901',
+    './app/src/ui/login.py : C901'
 ]
