@@ -26,6 +26,7 @@ pydantic = "^2.6.4"
 google-auth = "^2.29.0"
 extra-streamlit-components = "^0.1.71"
 streamlit-option-menu = "^0.3.12"
+flake8-pyproject = "^1.2.3"
 
 
 [build-system]
@@ -53,6 +54,6 @@ pythonpath = [
     skip_empty = true
 
 [tool.flake8]
-per-file-ignores = """
-    ui_app.py: C901
-"""
+per-file-ignores = [
+    './app/src/ui/*:C901',
+]
