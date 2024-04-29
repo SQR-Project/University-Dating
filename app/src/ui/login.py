@@ -1,4 +1,3 @@
-
 from src.models.auth import AuthWithEmailRequest
 from src.services.auth_service import ACCESS_TOKEN_NAME, REFRESH_TOKEN_NAME
 import streamlit as st
@@ -65,7 +64,7 @@ def app():
             name=name,
             surname=surname,
             age=age,
-            primary_interest=Interest(main_interest_box)
+            primary_interest=main_interest_box
         )
 
         profile_service.create_profile(token_data, profile_to_create)
@@ -142,13 +141,16 @@ def app():
         st.session_state['userid'] = ''  # pragma: no mutate
         st.session_state['email'] = ''  # pragma: no mutate
 
-    if not st.session_state["loggedin"]:  # pragma: no mutate
+    if not st.session_state.get("loggedin", False):  # pragma: no mutate
         login_window()
     else:
         profile = profile_service.get_profile_by_email(
             st.session_state["email"])  # pragma: no mutate
-        st.text('Name :' + profile.name + ' ' + profile.surname)  # pragma: no mutate  # noqa: E501
+        st.text('Name : ' + profile.name + ' ' + profile.surname)  # pragma: no mutate  # noqa: E501
         st.text('Email : ' + profile.email)  # pragma: no mutate
         st.text('Age : ' + str(profile.age))  # pragma: no mutate
         st.text('Main interest : ' + profile.primary_interest.value)  # pragma: no mutate  # noqa: E501
         st.button('Sign out', on_click=sign_out)  # pragma: no mutate
+
+
+app()

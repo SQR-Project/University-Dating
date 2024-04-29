@@ -27,6 +27,7 @@ google-auth = "^2.29.0"
 extra-streamlit-components = "^0.1.71"
 streamlit-option-menu = "^0.3.12"
 flake8-pyproject = "^1.2.3"
+mutmut = "^2.4.5"
 
 
 [build-system]
